@@ -72,14 +72,25 @@ WSGI_APPLICATION = "portfolio.wsgi.application"
 
 # DATABASE
 # Use DATABASE_URL provided by Railway
-DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
+else:
+    # Local dev fallback
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "myportfolio",
+            "USER": "postgres",
+            "PASSWORD": "0701334248",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
+   
 # PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {
