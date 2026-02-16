@@ -80,17 +80,13 @@ if DATABASE_URL:
     }
 else:
     # Local dev fallback
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": "myportfolio",
-            "USER": "postgres",
-            "PASSWORD": "0701334248",
-            "HOST": "localhost",
-            "PORT": "5432",
-        }
-    }
-   
+   DATABASES = {
+    "default": dj_database_url.parse(
+        os.environ.get("DATABASE_URL"),  # Railway provides this automatically
+        conn_max_age=600,
+        ssl_require=True  # ensures secure connection
+    )
+}
 # PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {
