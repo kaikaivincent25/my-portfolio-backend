@@ -8,22 +8,15 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # SECURITY
-
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
-
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com",
+    "*",  # Allow all hosts; can restrict to Railway/Vercel domains later
 ]
 
-
 # APPLICATIONS
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -36,7 +29,7 @@ INSTALLED_APPS = [
     "core",
 ]
 
-
+# REST FRAMEWORK
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
@@ -45,14 +38,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-
 # MIDDLEWARE
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -60,7 +50,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 
 ROOT_URLCONF = "portfolio.urls"
 
@@ -81,20 +70,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "portfolio.wsgi.application"
 
-
 # DATABASE
-# Uses local PostgreSQL by default.
-# On Render, DATABASE_URL will override this automatically.
-
+# Use DATABASE_URL provided by Railway
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgresql://postgres:0701334248@localhost:5432/myportfolio"
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
     )
 }
 
-
 # PASSWORD VALIDATION
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -110,43 +96,33 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # INTERNATIONALIZATION
-
 LANGUAGE_CODE = "en-us"
-
 TIME_ZONE = "UTC"
-
 USE_I18N = True
 USE_TZ = True
 
-
 # STATIC FILES
-
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-
 # MEDIA FILES
-
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
 # DEFAULT PRIMARY KEY
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 # CORS
-
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:3000",  # local dev
     "http://127.0.0.1:3000",
-    # Replace this after frontend deployment
-    # "https://your-frontend-name.onrender.com",
+    os.environ.get("FRONTEND_URL", "https://your-vercel-app.vercel.app"),
 ]
-
 CORS_ALLOW_CREDENTIALS = True
+
+# SECURITY SETTINGS
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = "DENY"
